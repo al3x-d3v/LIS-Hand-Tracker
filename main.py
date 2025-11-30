@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import data_processing
 
 # 1. Configurazione MediaPipe
 mp_hands = mp.solutions.hands
@@ -39,6 +40,10 @@ while cap.isOpened():
     # Se abbiamo trovato delle mani...
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
+
+            lista=data_processing.pre_pocessing_landmark(hand_landmarks.landmark)
+            print(f"polso : {lista[2]:.4f}, {lista[2]:.4f}")
+
             # Disegniamo lo scheletro sull'immagine ORIGINALE (non quella RGB)
             # mp_hands.HAND_CONNECTIONS serve per disegnare le linee tra i punti
             mp_drawing.draw_landmarks(
@@ -49,9 +54,9 @@ while cap.isOpened():
     # Mostriamo l'immagine a schermo in una finestra chiamata "LIS Hand Tracker"
     cv2.imshow('LIS Hand Tracker', image)
 
-    # 6. USCITA
+    # 6. USCITAq
     # Aspetta 5ms e controlla se è stato premuto il tasto 'q' (codice ASCII 113)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(2) & 0xFF == ord('q'):
         break
 
 # Pulizia finale
