@@ -9,7 +9,7 @@ mp_drawing = mp.solutions.drawing_utils
 # static_image_mode=False perché è un video, non una foto
 # max_num_hands=1 per ora, così è più veloce
 hands = mp_hands.Hands(static_image_mode=False,
-                       max_num_hands=1,
+                       max_num_hands=2,
                        min_detection_confidence=0.5,
                        min_tracking_confidence=0.5)
 
@@ -29,7 +29,7 @@ while cap.isOpened():
     # 3. PRE-PROCESSING
     # OpenCV ci dà l'immagine in BGR, ma MediaPipe la vuole in RGB.
     # Cerca la costante di conversione colore BGR -> RGB
-    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # COMPLETAMI: Qual è il flag giusto?
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
 
     # 4. INFERENZA (Il cuore dell'AI)
     # Passiamo l'immagine RGB al modello
