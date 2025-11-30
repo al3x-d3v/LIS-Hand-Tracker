@@ -15,7 +15,7 @@ hands = mp_hands.Hands(static_image_mode=False,
 
 # 2. Configurazione Webcam
 # Usa l'indice 0 per la webcam di default
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 print("Avvio webcam... Premi 'q' per uscire.")
 
@@ -51,7 +51,7 @@ while cap.isOpened():
 
     # 6. USCITA
     # Aspetta 5ms e controlla se è stato premuto il tasto 'q' (codice ASCII 113)
-    if cv2.waitKey(5) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 # Pulizia finale
