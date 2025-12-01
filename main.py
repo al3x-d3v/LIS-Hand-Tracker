@@ -1,12 +1,24 @@
 import cv2
 import mediapipe as mp
+import numpy as np
 import data_processing
+import pickle
 import save_date
 
 # 1. Configurazione MediaPipe
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 
+#Caricamento modello
+print("Carico moello AI")
+try :
+    model_dict = pickle.load(open('./model.p', 'rb'))
+    model = model_dict['model']
+    encoder = pickle.load(open('./label_encoder.p', 'rb'))
+    print("Modello Caricato correttamente!")
+except Exception as e:
+    print("Errore nel caricamento del modello ai : {e}" )
+    exit()
 # Inizializziamo il modello
 # static_image_mode=False perché è un video, non una foto
 # max_num_hands=1 per ora, così è più veloce
@@ -37,13 +49,31 @@ while cap.isOpened():
     # Passiamo l'immagine RGB al modello
     results = hands.process(image_rgb)
 
-    k =  cv2.waitKey(2)
+    k =  cv2.waitKey(100)
+    cv2.rectangle(image, (0,0), (160, 60), (0,0,0), -1)
     # 5. VISUALIZZAZIONE
     # Se abbiamo trovato delle mani...
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:           
             lista=data_processing.pre_pocessing_landmark(hand_landmarks.landmark)
-            
+            # Codice riconoscimento
+            probabilities = model.predict_proba([lista])[0]
+            best_class_id = np.argmax(probabilities)
+            highest_prob = np.max(probabilities)
+            threshold = 0.9
+            if highest_prob>threshold :
+                predicted_character = encoder.inverse_transform([best_class_id])[0]
+                #print(f"Lettera : {predicted_character}")
+                cv2.putText(image, 
+                        predicted_character, 
+                        (20, 45), # Posizione (x, y)
+                        cv2.FONT_HERSHEY_SIMPLEX, 
+                        1.5,      # Grandezza Font
+                        (255, 255, 255), # Colore Bianco
+                        3,        # Spessore
+                        cv2.LINE_AA)
+            #Codice ADDESTRAMENTO
+            '''
             if k & 0xFF == ord('a'):        
                 save_date.save_on_csv('a', lista)
             elif k & 0xFF == ord('b'):
@@ -52,6 +82,9 @@ while cap.isOpened():
                 save_date.save_on_csv('c', lista)
             elif k & 0xFF == ord('d'):
                 save_date.save_on_csv('d', lista)
+            '''
+
+            
             # Disegniamo lo scheletro sull'immagine ORIGINALE (non quella RGB)
             # mp_hands.HAND_CONNECTIONS serve per disegnare le linee tra i punti
             mp_drawing.draw_landmarks(
